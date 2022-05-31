@@ -34,13 +34,13 @@ time = 0
 
 score = 0
 tedfont = pygame.font.SysFont("Comic Sans MS" , 30)
-scor_text = tedfont.render("SCORE: " + str(score), True, (202,225,255))
 
 
 play = True
 is_red = False
 switch_time = random.randint(100, 500)
 while play:
+    scor_text = tedfont.render("SCORE: " + str(score), True, (202,225,255))
     screen.blit(bg,(0,0))
     screen.blit(scor_text, (410, 100))
     for event in pygame.event.get():
@@ -48,9 +48,9 @@ while play:
             play = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and not is_red:
-                pass
+                score += 1
             if event.key == pygame.K_SPACE and is_red:
-                
+                score = 0
                 screen.blit(gameover,(100,70))
                 pygame.display.flip()
                 pygame.time.delay(5000)
