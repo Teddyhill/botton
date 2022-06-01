@@ -3,6 +3,13 @@ from turtle import Screen
 from numpy import blackman
 import pygame
 import random
+import cv2
+import mediapipe as mp  
+  
+vid = cv2.VideoCapture(0)
+mp_Hands = mp.solutions.hands
+hands = mp_Hands.Hands()
+mpDraw = mp.solutions.drawing_utils
 
 WINDOW_W = 1000
 WINDOW_H = 641
@@ -38,8 +45,30 @@ tedfont = pygame.font.SysFont("Comic Sans MS" , 30)
 
 play = True
 is_red = False
-switch_time = random.randint(100, 500)
+switch_time = random.randint(10,28)
 while play:
+
+
+    ret, frame = vid.read()
+    frame = cv2.flip(frame, 1)
+    RGB_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    results = hands.process(RGB_image)
+    multiLandMarks = results.multi_hand_landmarks
+
+    if multiLandMarks:
+            for handLms in multiLandMarks:
+                mpDraw.draw_landmarks(frame, handLms, mp_Hands.HAND_CONNECTIONS)
+
+
+
+    cv2.imshow('frame', frame)
+      
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+
     scor_text = tedfont.render("SCORE: " + str(score), True, (202,225,255))
     screen.blit(bg,(0,0))
     screen.blit(scor_text, (410, 100))
@@ -65,8 +94,12 @@ while play:
     if time>=switch_time:
         is_red = not is_red
         time=0
-        switch_time = random.randint(100,500)
+        switch_time = random.randint(10,28)
 
     pygame.display.flip()
 
-pygame.quit()
+pygame.quit()      
+  
+vid.release()
+
+cv2.destroyAllWindows()
