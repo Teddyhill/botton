@@ -19,11 +19,6 @@ pygame.init()
 
 
 
-
-
-
-
-
 screen = pygame.display.set_mode(WINDOW_SIZE)
 bg = pygame.image.load("spongback.jpg")
 bg = pygame.transform.scale(bg,(WINDOW_W,WINDOW_H))
@@ -41,7 +36,7 @@ time = 0
 
 score = 0
 tedfont = pygame.font.SysFont("Comic Sans MS" , 30)
-
+ 
 
 play = True
 is_red = False
@@ -49,7 +44,7 @@ switch_time = random.randint(10,28)
 while play:
 
 
-    ret, frame = vid.read()
+    ret, frame = vid.read(0)
     frame = cv2.flip(frame, 1)
     RGB_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -57,11 +52,32 @@ while play:
     multiLandMarks = results.multi_hand_landmarks
 
     if multiLandMarks:
-            for handLms in multiLandMarks:
-                mpDraw.draw_landmarks(frame, handLms, mp_Hands.HAND_CONNECTIONS)
-
-
-
+        for handLms in multiLandMarks:
+            mpDraw.draw_landmarks(frame, handLms, mp_Hands.HAND_CONNECTIONS)
+        y8 = multiLandMarks[0].landmark[8].y
+        y5 = multiLandMarks[0].landmark[5].y
+        y12 = multiLandMarks[0].landmark[12].y
+        y9 = multiLandMarks[0].landmark[9].y
+        y16 = multiLandMarks[0].landmark[16].y
+        y13 = multiLandMarks[0].landmark[13].y
+        y20 = multiLandMarks[0].landmark[20].y
+        y17 = multiLandMarks[0].landmark[17].y
+        under1 = y8 > y5 
+        under2 = y12 > y9
+        under3 = y16 > y13
+        under4 = y20 > y17
+        all_y = under1 and under2 and under3 and under4 
+        semi_y = under1 and under2 and under3
+        if all_y == True and not is_red:
+            score += 1
+        elif all_y == True and is_red:
+                score = 0
+                screen.blit(gameover,(100,70))
+                pygame.display.flip()
+                pygame.time.delay(3000)
+                pygame.event.get()
+        elif under4 == True and semi_y == False:
+            break
     cv2.imshow('frame', frame)
       
 
@@ -81,15 +97,15 @@ while play:
             if event.key == pygame.K_SPACE and is_red:
                 score = 0
                 screen.blit(gameover,(100,70))
-                pygame.display.flip()
-                pygame.time.delay(5000)
+                pygame.time.delay(3000)
                 pygame.event.get()
     time = time + 1
     if is_red:
         screen.blit(Rbotton,(389,200))
     else:
         screen.blit(Gbotton,(395,210))
-        
+
+   
 
     if time>=switch_time:
         is_red = not is_red
